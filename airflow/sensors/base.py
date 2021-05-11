@@ -249,6 +249,7 @@ class BaseSensorOperator(BaseOperator, SkipMixin):
         if self.exponential_backoff:
             min_backoff = int(self.poke_interval * (2 ** (try_number - 2)))
             self.log.info("min_backoff: %s", min_backoff)
+            self.log.info("try_number: %s", try_number)
 
             run_hash = int(
                 hashlib.sha1(
