@@ -248,6 +248,7 @@ class BaseSensorOperator(BaseOperator, SkipMixin):
         """Using the similar logic which is used for exponential backoff retry delay for operators."""
         if self.exponential_backoff:
             min_backoff = int(self.poke_interval * (2 ** (try_number - 2)))
+            self.log.info("min_backoff: %s", min_backoff)
 
             run_hash = int(
                 hashlib.sha1(
@@ -256,8 +257,11 @@ class BaseSensorOperator(BaseOperator, SkipMixin):
                 16,
             )
             modded_hash = min_backoff + run_hash % min_backoff
+            self.log.info("run_hash: %s", run_hash)
+            self.log.info("modded_hash: %s", modded_hash)
 
             delay_backoff_in_seconds = min(modded_hash, timedelta.max.total_seconds() - 1)
+            self.log.info("delay_backoff_in_seconds: %s", delay_backoff_in_seconds)
             new_interval = min(self.timeout - int(run_duration()), delay_backoff_in_seconds)
             self.log.info("new %s interval is %s", self.mode, new_interval)
             return new_interval
